@@ -33,6 +33,7 @@ object Invites {
     def apply(invitee: String, email: String): CreateInvitation =
       CreateInvitation(Invitation(invitee, email))
   }
-  case object InvitationCreated
-  case object InvitationAlreadyExists
+  sealed trait Status
+  case object InvitationCreated extends Status
+  case object InvitationAlreadyExists extends Status
 }

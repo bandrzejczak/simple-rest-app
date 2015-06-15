@@ -30,8 +30,9 @@ trait Dispatcher extends HttpService with SprayJsonSupport {
         } ~
         post {
           entity(as[Invitation]) { invitation =>
-            onSuccess(invites ? CreateInvitation(invitation)) {
-              _ => complete(HttpResponse(StatusCodes.Created))
+            onSuccess((invites ? CreateInvitation(invitation)).mapTo[Status]) {
+              case InvitationCreated => complete(HttpResponse(StatusCodes.Created))
+              case InvitationAlreadyExists => complete(HttpResponse(StatusCodes.Conflict))
             }
           }
         }
