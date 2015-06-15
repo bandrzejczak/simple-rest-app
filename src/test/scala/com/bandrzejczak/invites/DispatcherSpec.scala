@@ -3,7 +3,7 @@ package com.bandrzejczak.invites
 import akka.actor.ActorRefFactory
 import com.bandrzejczak.invites.Invites.Invitation
 import org.scalatest.{FlatSpec, Matchers}
-import spray.http.StatusCodes
+import spray.http.{HttpEntity, StatusCodes}
 import spray.testkit.ScalatestRouteTest
 
 class DispatcherSpec
@@ -19,6 +19,13 @@ class DispatcherSpec
     Get("/invitation") ~> routes ~> check {
       status shouldBe StatusCodes.OK
       responseAs[List[Invitation]] shouldBe List[Invitation]()
+    }
+  }
+
+  "Dispatcher" should "create an invite" in {
+    Post("/invitation", Invitation("John Smith", "john@smith.mx")) ~> routes ~> check {
+      status shouldBe StatusCodes.Created
+      responseAs[HttpEntity] shouldBe HttpEntity.Empty
     }
   }
 }
