@@ -1,6 +1,6 @@
 package com.bandrzejczak.invites
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.bandrzejczak.invites.Invites._
@@ -10,6 +10,15 @@ import spray.httpx.SprayJsonSupport
 import spray.routing.HttpService
 
 import scala.concurrent.duration._
+
+class DispatcherActor(val invites: ActorRef) extends Actor with Dispatcher {
+  def actorRefFactory = context
+  def receive = runRoute(routes)
+}
+
+object DispatcherActor {
+  def props(invites: ActorRef) = Props(classOf[DispatcherActor], invites)
+}
 
 trait Dispatcher extends HttpService with SprayJsonSupport {
   import JsonProtocol._
