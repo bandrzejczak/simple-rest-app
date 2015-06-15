@@ -50,4 +50,24 @@ class InvitesSpec
     expectMsg(Invitations(Invitation("John Smith", "john@smith.mx")))
   }
 
+  it should "respond to a query with list of invitation unique in relation to email" in {
+    //given
+    val invites = system.actorOf(Invites.props)
+    invites ! CreateInvitation("John Smith", "john@smith.mx")
+    expectMsg(InvitationCreated)
+    invites ! CreateInvitation("John Murphy", "john@smith.mx")
+    expectMsg(InvitationAlreadyExists)
+    invites ! CreateInvitation("John Lennon", "john@lennon.mx")
+    expectMsg(InvitationCreated)
+    //when
+    invites ! InvitationsQuery
+    //then
+    expectMsg(
+      Invitations(
+        Invitation("John Smith", "john@smith.mx"),
+        Invitation("John Lennon", "john@lennon.mx")
+      )
+    )
+  }
+
 }
