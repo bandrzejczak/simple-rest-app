@@ -39,4 +39,15 @@ class InvitesSpec
     expectMsg(InvitationAlreadyExists)
   }
 
+  it should "respond to a query with list of all created invitations" in {
+    //given
+    val invites = system.actorOf(Invites.props)
+    invites ! CreateInvitation("John Smith", "john@smith.mx")
+    expectMsg(InvitationCreated)
+    //when
+    invites ! InvitationsQuery
+    //then
+    expectMsg(Invitations(Invitation("John Smith", "john@smith.mx")))
+  }
+
 }
