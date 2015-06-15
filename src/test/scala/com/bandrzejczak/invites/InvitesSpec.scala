@@ -2,7 +2,7 @@ package com.bandrzejczak.invites
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
-import com.bandrzejczak.invites.Invites.{CreateInvitation, InvitationCreated, Invitations, InvitationsQuery}
+import com.bandrzejczak.invites.Invites._
 import org.scalatest.FlatSpecLike
 
 class InvitesSpec
@@ -26,6 +26,17 @@ class InvitesSpec
     invites ! CreateInvitation("John Smith", "john@smith.mx")
     //then
     expectMsg(InvitationCreated)
+  }
+
+  it should "reject an invitation with email, that already was invited" in {
+    //given
+    val invites = system.actorOf(Invites.props)
+    invites ! CreateInvitation("John Smith", "john@smith.mx")
+    expectMsg(InvitationCreated)
+    //when
+    invites ! CreateInvitation("John Smith", "john@smith.mx")
+    //then
+    expectMsg(InvitationAlreadyExists)
   }
 
 }
