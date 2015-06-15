@@ -13,6 +13,8 @@ class DispatcherSpec
   with Dispatcher {
   import JsonProtocol._
 
+  val invites = system.actorOf(Invites.props)
+
   def actorRefFactory: ActorRefFactory = system
 
   "Dispatcher" should "fetch initially empty list of invites" in {
@@ -26,6 +28,18 @@ class DispatcherSpec
     Post("/invitation", Invitation("John Smith", "john@smith.mx")) ~> routes ~> check {
       status shouldBe StatusCodes.Created
       responseAs[HttpEntity] shouldBe HttpEntity.Empty
+    }
+  }
+
+  "Dispatcher" should "fetch invites lists with recently added invitations" in {
+    Post("/invitation", Invitation("John Smith", "john@smith.mx")) ~> routes ~> check {
+      status shouldBe StatusCodes.Created
+      responseAs[HttpEntity] shouldBe HttpEntity.Empty
+    }
+
+    Get("/invitation") ~> routes ~> check {
+      status shouldBe StatusCodes.OK
+      responseAs[List[Invitation]] shouldBe List(Invitation("John Smith", "john@smith.mx"))
     }
   }
 }
